@@ -12,7 +12,9 @@ forbidden_dir = ['Files',
 'Autofill',
 'Autofills',
 'browsers',
-'CheCkeR']
+'CheCkeR',
+'VN[',
+'CN[']
 
 forbidden_files = ['InstalledSoftware',
 'ProcessList',
@@ -31,18 +33,27 @@ forbidden_files = ['InstalledSoftware',
 'information.bak',
 'Desktop.png',
 'Desktop.jpg',
-'Clipboard.txt']
+'Clipboard.txt',
+'ImportantAutofill']
 
 def remove_forbidden_items(root_dir, forbidden_dirs, forbidden_files):
     for item in os.listdir(root_dir):
         item_path = os.path.join(root_dir, item)
-        if os.path.isdir(item_path) and item in forbidden_dirs:
-            shutil.rmtree(item_path) # remove the directory
-        elif os.path.isfile(item_path):
-            if any(substring in item for substring in forbidden_files):
-                os.remove(item_path) # remove the file
-        else:
-            remove_forbidden_items(item_path, forbidden_dirs, forbidden_files)
+        try:
+            if os.path.isdir(item_path) and item in forbidden_dirs:
+                shutil.rmtree(item_path) # remove the directory
+                print(f"Folder removed - {item_path}")
+            elif not os.listdir(item_path):
+                os.rmdir(item_path)
+                print(f"Empty folder removed - {item_path}")
+            elif os.path.isfile(item_path):
+                if any(substring in item for substring in forbidden_files):
+                    os.remove(item_path) # remove the file
+                    print(f"File removed - {item_path}")
+            else:
+                remove_forbidden_items(item_path, forbidden_dirs, forbidden_files)
+        except:
+            pass
 
 root_dir = './'
 remove_forbidden_items(root_dir, forbidden_dir, forbidden_files)
